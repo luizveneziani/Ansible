@@ -1,0 +1,33 @@
+---
+- hosts: R1
+  connection: local
+  gather_facts: false
+
+  vars:
+    cli:
+      username: admin
+      password: admin
+      transport: cli
+    interface: Loopback100
+
+  tasks:
+  - name: Ensure {{ interface }} interface does not exist
+    ios_command:
+      commands: show ip interface brief | inc {{ interface }}
+    register: pre_imp_check
+
+  - name: Create {{ interface }} interface
+    ios_config:
+      authorize: yes
+      parents: interface {{ interface }}
+      lines:
+        - description Test Interface
+        - ip address 2.2.2.2 255.255.255.255
+      after: "no shutdown"
+      match: line
+      replace: line
+    register: imp_check
+
+  - debug:
+      var: imp_check
+

@@ -1,0 +1,15 @@
+[routers]
+R[1:3]
+MGMT-RO
+
+[switches]
+S1
+MGMT-SW
+
+[prod]
+R[1:3]
+SW1
+
+[mgmt]
+MGMT-SW
+MGMT-RO

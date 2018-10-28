@@ -1,0 +1,6 @@
+[user]
+	email = luiz.veneziani@outlook.com
+	name = luizveneziani
+[alias]
+# creates the alias git ca 'commit message here' 
+	ca = !sh -c 'git add -A && git commit -m \"$1\"' -

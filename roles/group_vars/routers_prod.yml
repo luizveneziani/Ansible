@@ -1,0 +1,26 @@
+---
+
+# group_vars for [routers:prod]
+
+domain:
+  name: "admin.com"
+
+user:
+  name: "admin"
+  pass: "admin"
+
+ospf:
+  domain: "2"
+  network: "10.0.1.0 0.0.1.255"
+
+bgp:
+  asn: "65002"
+  group: "internal"
+  neighbor1: "10.0.3.1"
+  neighbor2: "10.0.3.2"
+  neighbor3: "10.0.3.3"
+
+dgw:
+  mgmt:
+    ipv4: "10.0.1.254"
+

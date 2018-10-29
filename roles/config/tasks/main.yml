@@ -1,0 +1,60 @@
+---
+
+- name: configuring global system settings
+  ios_config:
+    lines:
+      - hostname "{{ hostname }}"
+      - ip domain name "{{ domain.name }}"
+      - username "{{ user.name }}" privilege 15 password 0 "{{ user.pass }}"
+
+- name: configuring interfaces
+  ios_l3_interface:
+    aggregate:
+      - { name: "{{ int.rtr.name }}", ipv4: "{{ int.rtr.ipv4 }}" }
+      - { name: "{{ int.ext.name }}", ipv4: "{{ int.ext.ipv4 }}" }
+      - { name: "{{ int.mgmt.name }}", ipv4: "{{ int.mgmt.ipv4 }}" }
+      - { name: "{{ int.prod.name }}", ipv4: "{{ int.prod.ipv4 }}" }
+
+- name: enabling interfaces
+  ios_interface:
+    aggregate:
+      - name: "{{ int.rtr.name }}"
+      - name: "{{ int.ext.name }}"
+      - name: "{{ int.mgmt.name }}"
+      - name: "{{ int.prod.name }}"
+    enabled: True
+
+- name: configuring ospf
+  ios_config:
+    parents:
+      - router ospf "{{ ospf.domain }}"
+    lines:
+      - router-id "{{ int.rtr.ipv4 }}"
+      - network "{{ ospf.network }}" area 0
+
+- name: configuring bgp peer-group
+  ios_config:
+    parents:
+      - router bgp "{{ bgp.asn }}"
+    lines:
+      - neighbor "{{ bgp.group }}" peer-group
+      - neighbor "{{ bgp.group }}" remote-as "{{ bgp.asn }}"
+      - neighbor "{{ bgp.group }}" update-source "{{ int.rtr.name }}"
+
+- name: configuring bgp neighbors
+  ios_config:
+    parents:
+      - router bgp "{{ bgp.asn }}"
+    lines:
+      - neighbor "{{ item }}" peer-group "{{ bgp.group }}"
+    with_items:
+      - "{{ bgp.neighbor1 }}"
+      - "{{ bgp.neighbor2 }}"
+      - "{{ bgp.neighbor3 }}"
+
+- name: configuring static routes
+  ios_static_route:
+    prefix: 0.0.0.0
+    mask: 0.0.0.0
+    next_hop: "{{ dgw.mgmt.ipv4 }}"
+
